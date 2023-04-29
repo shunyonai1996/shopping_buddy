@@ -1,10 +1,10 @@
-FROM node:16
+FROM node:14
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install -g vue @vue/cli-service-global
+RUN npm install -g @vue/cli-service-global
 
 RUN npm install
 
@@ -15,4 +15,3 @@ COPY . .
 EXPOSE 8080
 
 CMD ["npm", "run", "serve"]
-
