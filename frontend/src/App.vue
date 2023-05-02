@@ -1,17 +1,21 @@
 <template>
     <div id="app">
-      <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+        <header>
+        <nav>
+            <router-link to="/">Home</router-link> |
+            <router-link to="/about">About</router-link>
+        </nav>
+        </header>
+        <main>
+        <router-view></router-view>
+        </main>
     </div>
-  </template>
-  
-  <script lang="ts">
-  import Vue from 'vue';
-  import HelloWorld from './components/HelloWorld.vue';
-  
-  export default Vue.extend({
-    name: 'App',
-    components: {
-      HelloWorld
-    }
-  });
-  </script>
+</template>
+
+<script lang="ts">
+    import Vue from 'vue';
+
+    export default Vue.extend({
+        name: 'App'
+    });
+</script>
