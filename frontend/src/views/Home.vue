@@ -1,6 +1,13 @@
 <template>
-    <div id="app">
-      <img alt="Vue logo" src="./assets/logo.png">
-      <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-    </div>
-  </template>
+  <MainComponent />
+</template>
+
+<script lang="ts">
+import MainComponent from "../components/Main.vue";
+
+export default {
+  components: {
+    MainComponent
+  },
+};
+</script>
