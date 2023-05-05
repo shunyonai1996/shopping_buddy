@@ -1,21 +1,21 @@
 <template>
-    <div id="app">
-        <header>
-        <nav>
-            <router-link to="/">Home</router-link> |
-            <router-link to="/about">About</router-link>
-        </nav>
-        </header>
-        <main>
-        <router-view></router-view>
-        </main>
-    </div>
+    <v-app>
+        <HeaderComponent />
+        <router-view />
+        <FooterComponent />
+    </v-app>
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
+import HeaderComponent from './components/Header.vue'
+import FooterComponent from './components/Footer.vue'
+import MainComponent from './components/Main.vue'
 
-    export default Vue.extend({
-        name: 'App'
-    });
+export default {
+    components: {
+        HeaderComponent,
+        FooterComponent,
+        MainComponent
+    },
+};
 </script>
