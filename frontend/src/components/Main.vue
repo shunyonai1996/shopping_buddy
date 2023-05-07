@@ -1,36 +1,72 @@
 <template>
-  <v-main>
-    <v-container>
-      <draggable v-model="tasks" :animation="300" @end="onTaskOrderChange">
-        <v-row v-for="task in tasks" :key="task.id" class="mr-auto ml-auto">
-          <v-col class="d-flex align-center pt-1 pa-0 bg-surface-variant">
-            <v-checkbox
-              style="transform: scale(0.6); background-color: rebeccapurple;"
-              label="do"
+  <div style="position: relative; min-height: 100%;">
+    <v-main ref="mainComponent">
+      <v-container class="pb-5">
+        <draggable 
+        v-model="tasks"
+        :animation="300"
+        handle=".drag-handle">
+          <v-row v-for="(task, index) in tasks" :key="task.id" class="align-center my-0 py-0" style="min-height: 40px; max-height: 40px;">
+            <v-col cols="2" class="d-flex justify-center align-center pa-0 ma-0">
+              <v-app-bar-nav-icon class="drag-handle"></v-app-bar-nav-icon>
+            </v-col>
+            <v-col cols="1" class="d-flex justify-center align-center pa-0 ma-0">
+              <v-checkbox
               class="todo-checkbox"
-              color="orange"
-              hide-details
-              @change="toggleTaskCompletion(task)"
-            ></v-checkbox>
+              v-model="task.completed"
+              ></v-checkbox>
+            </v-col>
+            <v-col cols="7" class="d-flex align-center pa-0 ma-0">
+              <div class="scrollable-text">
+                <p class="text-center mb-0" :class="{ 'completed-task': task.completed }">{{ task.text }}</p>
+              </div>
+            </v-col>
+            <v-col cols="2" class="d-flex align-center pa-0 ma-0">
+              <v-btn small @click="deleteTask(index)" class="todo-reorder text-capitalize" icon>
+                <v-icon>
+                  mdi-backspace
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </draggable>
+
+        <v-row
+          position="fixed"
+          bottom
+          justify="center"
+          class="align-center my-0 py-0 mb-5"
+          style="min-height: 40px; max-height: 40px; width: 100%; z-index: 1000;"
+        >
+          <v-col class="d-flex justify-center align-center" cols="1">
+            <v-btn small @click="removeAllTask" class="text-capitalize ma-1" icon>
+              <v-icon>
+                mdi-delete
+              </v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="7">
             <v-text-field
-              label="what to buy...?"
+              label="何が必要？"
               class="todo-input"
-              :class="{ 'completed-task': task.completed }"
-              v-model="task.text"
+              v-model="newTaskText"
             ></v-text-field>
-            <div class="ma-1">
-              <v-btn x-small @click="addTask" class="todo-reorder text-capitalize ma-1">+</v-btn>
-              <v-btn x-small @click="deleteTask(task.id)" class="todo-reorder text-capitalize ma-1" :disabled="tasks.length === 1">-</v-btn>
-            </div>
+          </v-col>
+          <v-col class="d-flex justify-center align-center" cols="1">
+            <v-btn small @click="addTask" class="todo-reorder text-capitalize ma-1" icon>
+              <v-icon>
+                mdi-plus-circle-outline
+              </v-icon>
+            </v-btn>
           </v-col>
         </v-row>
-      </draggable>
-    </v-container>
-  </v-main>
+      </v-container>
+    </v-main>
+  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Watch } from "vue-property-decorator";
 import draggable from "vuedraggable";
 
 @Component({
@@ -38,6 +74,7 @@ import draggable from "vuedraggable";
     draggable,
   },
 })
+
 export default class MainComponent extends Vue {
   tasks = [
     {
@@ -46,9 +83,11 @@ export default class MainComponent extends Vue {
       completed: false,
     },
   ];
-
-  nextTaskID = 2;
-
+  
+  checkbox = true;
+  newTaskText = "";
+  nextTaskID = Number(localStorage.getItem("nextTaskID")) || 2;
+  
   mounted() {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
@@ -56,30 +95,42 @@ export default class MainComponent extends Vue {
     }
   }
 
-  addTask() {
-    this.tasks.push({
-      id: this.nextTaskID,
-      text: "",
-      completed: false,
-    });
-    this.nextTaskID++;
+  // `task`プロパティの変更を監視
+  @Watch("tasks", { deep: true })
+  updateLocalStorage() {
     localStorage.setItem("tasks", JSON.stringify(this.tasks));
+  }
+
+  // タスクの追加
+  addTask() {
+    if (this.newTaskText) {
+      this.tasks.push({
+        id: this.nextTaskID,
+        text: this.newTaskText,
+        completed: false,
+      });
+    }
+    this.nextTaskID++;
+    this.newTaskText = "";
+    localStorage.setItem("nextTaskID", String(this.nextTaskID));
     console.log(this.tasks);
   }
   
-  deleteTask(id: number) {
-    this.tasks = this.tasks.filter(task => task.id !== id);
-    localStorage.setItem("tasks", JSON.stringify(this.tasks));
-    console.log(this.tasks);
+  // タスクの削除
+  deleteTask(index: number) {
+    this.tasks.splice(index, 1);
   }
 
+  // タスクの完了/未完了の判定
   toggleTaskCompletion(task: { completed: boolean }) {
     task.completed = !task.completed;
    }
-   
-  onTaskOrderChange(event: any) {
-  // タスク順序が変更された後の処理をここで行うことができます。
-  // 例えば、新しい順序をデータベースに保存するなど。
+
+  // localStorageのtasksのデータ削除
+  removeAllTask() {
+    if(window.confirm("すべての買い物リストを削除しますか？")) {
+      this.tasks = [];
+    }
   }
 }
 </script>
@@ -87,5 +138,17 @@ export default class MainComponent extends Vue {
 <style>
 .completed-task {
   text-decoration: line-through;
+}
+.scrollable-text {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.input-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 </style>

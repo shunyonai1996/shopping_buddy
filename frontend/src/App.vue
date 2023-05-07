@@ -12,7 +12,7 @@ import FooterComponent from './components/Footer.vue'
 import MainComponent from './components/Main.vue'
 
 export default {
-    components: {
+    components:　 {
         HeaderComponent,
         FooterComponent,
         MainComponent

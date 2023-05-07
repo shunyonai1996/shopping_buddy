@@ -1,6 +1,12 @@
 <template>
   <v-app-bar app color="blue" dark>
-    <v-app-bar-nav-icon></v-app-bar-nav-icon>
+    <v-img
+      :src="require('/src/assets/logo.jpg')" 
+      max-height="40"
+      max-width="40"
+      class="mr-3"
+      contain
+    ></v-img>
     <v-app-bar-title>Shopping Buddy</v-app-bar-title>
   </v-app-bar>
 </template>
