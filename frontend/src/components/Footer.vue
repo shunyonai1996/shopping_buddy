@@ -16,5 +16,6 @@ export default {
 <style>
 .footer {
     margin: auto;
+    font-size: 8px;
 }
 </style>
