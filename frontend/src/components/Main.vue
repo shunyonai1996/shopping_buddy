@@ -1,60 +1,72 @@
 <template>
-  <v-main>
-    <v-container>
-      <v-row justify="center" class="align-center my-0 py-0 mb-5" style="min-height: 40px; max-height: 40px;">
-        <v-col class="d-flex align-center" cols=2>
-          <v-btn small @click="addTask" class="todo-reorder text-capitalize ma-1" icon>
-            <v-icon>
-              mdi-plus-circle-outline
-            </v-icon>
-          </v-btn>
-        </v-col>
-        <v-col cols=9>
-          <v-text-field
-          label="何が必要？"
-          class="todo-input"
-          v-model="newTaskText"
-          ></v-text-field>
-        </v-col>
-      </v-row>
+  <div style="position: relative; min-height: 100%;">
+    <v-main ref="mainComponent">
+      <v-container class="pb-5">
+        <draggable 
+        v-model="tasks"
+        :animation="300"
+        handle=".drag-handle">
+          <v-row v-for="(task, index) in tasks" :key="task.id" class="align-center my-0 py-0" style="min-height: 40px; max-height: 40px;">
+            <v-col cols="2" class="d-flex justify-center align-center pa-0 ma-0">
+              <v-app-bar-nav-icon class="drag-handle"></v-app-bar-nav-icon>
+            </v-col>
+            <v-col cols="1" class="d-flex justify-center align-center pa-0 ma-0">
+              <v-checkbox
+              class="todo-checkbox"
+              v-model="task.completed"
+              ></v-checkbox>
+            </v-col>
+            <v-col cols="7" class="d-flex align-center pa-0 ma-0">
+              <div class="scrollable-text">
+                <p class="text-center mb-0" :class="{ 'completed-task': task.completed }">{{ task.text }}</p>
+              </div>
+            </v-col>
+            <v-col cols="2" class="d-flex align-center pa-0 ma-0">
+              <v-btn small @click="deleteTask(index)" class="todo-reorder text-capitalize" icon>
+                <v-icon>
+                  mdi-backspace
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </draggable>
 
-      <draggable 
-      v-model="tasks"
-      :animation="300"
-      @end="onTaskOrderChange"
-      handle=".drag-handle">
-        <v-row v-for="(task, index) in tasks" :key="task.id" class="align-center my-0 py-0" style="min-height: 40px; max-height: 40px;">
-
-          <v-col cols="2" class="d-flex justify-center align-center pa-0 ma-0">
-            <v-app-bar-nav-icon class="drag-handle"></v-app-bar-nav-icon>
-          </v-col>
-
-          <v-col cols="1" class="d-flex justify-center align-center pa-0 ma-0">
-            <v-checkbox
-            class="todo-checkbox"
-            @change="toggleTaskCompletion(task)"
-            ></v-checkbox>
-          </v-col>
-          <v-col cols="7" class="d-flex align-center pa-0 ma-0">
-            <div class="scrollable-text">
-              <p class="text-center mb-0" :class="{ 'completed-task': task.completed }">{{ task.text }}</p>
-            </div>
-          </v-col>
-          <v-col cols="2" class="d-flex align-center pa-0 ma-0">
-            <v-btn small @click="deleteTask(index)" class="todo-reorder text-capitalize" icon>
+        <v-row
+          position="fixed"
+          bottom
+          justify="center"
+          class="align-center my-0 py-0 mb-5"
+          style="min-height: 40px; max-height: 40px; width: 100%; z-index: 1000;"
+        >
+          <v-col class="d-flex justify-center align-center" cols="1">
+            <v-btn small @click="removeAllTask" class="text-capitalize ma-1" icon>
               <v-icon>
-                mdi-backspace
+                mdi-delete
+              </v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="7">
+            <v-text-field
+              label="何が必要？"
+              class="todo-input"
+              v-model="newTaskText"
+            ></v-text-field>
+          </v-col>
+          <v-col class="d-flex justify-center align-center" cols="1">
+            <v-btn small @click="addTask" class="todo-reorder text-capitalize ma-1" icon>
+              <v-icon>
+                mdi-plus-circle-outline
               </v-icon>
             </v-btn>
           </v-col>
         </v-row>
-      </draggable>
-    </v-container>
-  </v-main>
+      </v-container>
+    </v-main>
+  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Watch } from "vue-property-decorator";
 import draggable from "vuedraggable";
 
 @Component({
@@ -62,6 +74,7 @@ import draggable from "vuedraggable";
     draggable,
   },
 })
+
 export default class MainComponent extends Vue {
   tasks = [
     {
@@ -70,21 +83,25 @@ export default class MainComponent extends Vue {
       completed: false,
     },
   ];
+  
   checkbox = true;
   newTaskText = "";
   nextTaskID = Number(localStorage.getItem("nextTaskID")) || 2;
-
+  
   mounted() {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
       this.tasks = JSON.parse(storedTasks);
     }
   }
-  
-  // watch() {
-  //   console.log(this.tasks);
-  // }
 
+  // `task`プロパティの変更を監視
+  @Watch("tasks", { deep: true })
+  updateLocalStorage() {
+    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+  }
+
+  // タスクの追加
   addTask() {
     if (this.newTaskText) {
       this.tasks.push({
@@ -95,24 +112,25 @@ export default class MainComponent extends Vue {
     }
     this.nextTaskID++;
     this.newTaskText = "";
-    localStorage.setItem("tasks", JSON.stringify(this.tasks));
     localStorage.setItem("nextTaskID", String(this.nextTaskID));
     console.log(this.tasks);
   }
   
+  // タスクの削除
   deleteTask(index: number) {
     this.tasks.splice(index, 1);
-    localStorage.setItem("tasks", JSON.stringify(this.tasks));
   }
 
+  // タスクの完了/未完了の判定
   toggleTaskCompletion(task: { completed: boolean }) {
     task.completed = !task.completed;
    }
 
-  onTaskOrderChange(event: any) {
-  // タスク順序が変更された後の処理をここで行うことができます。
-  // 例えば、新しい順序をデータベースに保存するなど。
-  localStorage.setItem("tasks", JSON.stringify(this.tasks));
+  // localStorageのtasksのデータ削除
+  removeAllTask() {
+    if(window.confirm("すべての買い物リストを削除しますか？")) {
+      this.tasks = [];
+    }
   }
 }
 </script>
@@ -126,4 +144,11 @@ export default class MainComponent extends Vue {
   white-space: nowrap;
 }
 
+.input-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
 </style>
