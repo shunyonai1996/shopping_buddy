@@ -1,5 +1,5 @@
 <template>
-  <v-footer color="blue" dark absolute>
+  <v-footer color="#F57C00" dark absolute>
     <div class="footer">
         &copy; 2023 Shopping Buddy. All rights reserved.
     </div>
