@@ -1,5 +1,5 @@
 <template>
-  <div style="position: relative; min-height: 100%;">
+  <div class="orange lighten-5" style="position: relative; min-height: 100%; margin-top: 50px;">
     <v-main ref="mainComponent">
       <v-container class="pb-5">
         <draggable 
@@ -8,7 +8,11 @@
         handle=".drag-handle">
           <v-row v-for="(task, index) in tasks" :key="task.id" class="align-center my-0 py-0" style="min-height: 40px; max-height: 40px;">
             <v-col cols="2" class="d-flex justify-center align-center pa-0 ma-0">
-              <v-app-bar-nav-icon class="drag-handle"></v-app-bar-nav-icon>
+              <v-btn small @click="deleteTask(index)" class="todo-reorder text-capitalize" icon>
+                <v-icon>
+                  mdi-backspace
+                </v-icon>
+              </v-btn>
             </v-col>
             <v-col cols="1" class="d-flex justify-center align-center pa-0 ma-0">
               <v-checkbox
@@ -21,22 +25,20 @@
                 <p class="text-center mb-0" :class="{ 'completed-task': task.completed }">{{ task.text }}</p>
               </div>
             </v-col>
-            <v-col cols="2" class="d-flex align-center pa-0 ma-0">
-              <v-btn small @click="deleteTask(index)" class="todo-reorder text-capitalize" icon>
-                <v-icon>
-                  mdi-backspace
-                </v-icon>
-              </v-btn>
+            <v-col cols="2" class="d-flex justify-center align-center pa-0 ma-0">
+              <v-app-bar-nav-icon class="drag-handle"></v-app-bar-nav-icon>
             </v-col>
           </v-row>
         </draggable>
+      </v-container>
 
+      <v-container class="fixed">
         <v-row
           position="fixed"
           bottom
           justify="center"
-          class="align-center my-0 py-0 mb-5"
-          style="min-height: 40px; max-height: 40px; width: 100%; z-index: 1000;"
+          class="align-center my-0 py-0"
+          style="width: 100%; z-index: 1000; margin-bottom: ;"
         >
           <v-col class="d-flex justify-center align-center" cols="1">
             <v-btn small @click="removeAllTask" class="text-capitalize ma-1" icon>
@@ -45,10 +47,11 @@
               </v-icon>
             </v-btn>
           </v-col>
-          <v-col cols="7">
+          <v-col cols="8">
             <v-text-field
-              label="何が必要？"
+              label="入力して購入リストに追加"
               class="todo-input"
+              color="#F57C00"
               v-model="newTaskText"
             ></v-text-field>
           </v-col>
@@ -64,6 +67,7 @@
     </v-main>
   </div>
 </template>
+
 
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
@@ -144,11 +148,13 @@ export default class MainComponent extends Vue {
   white-space: nowrap;
 }
 
-.input-section {
+.fixed {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 100;
+  padding: 0;
 }
+
 </style>
