@@ -1,7 +1,13 @@
 <template>
   <div class="orange lighten-5" style="position: relative; min-height: 100%; margin-top: 50px;">
     <v-main ref="mainComponent">
-      <v-container class="pb-5">
+
+      <div v-if="tasks.length > 0">
+          <v-btn @click="addToBookmarks">このリストをブックマークに追加</v-btn>
+          <v-btn @click="removeAllTask">全て削除</v-btn>
+      </div>
+
+      <v-container class="pb-5" v-if="tasks.length > 0">
         <draggable 
         v-model="tasks"
         :animation="300"
@@ -80,22 +86,19 @@ import draggable from "vuedraggable";
 })
 
 export default class MainComponent extends Vue {
-  tasks = [
-    {
-      id: 1,
-      text: "",
-      completed: false,
-    },
-  ];
-  
+  tasks: { id: number; text: string; completed: boolean }[] = [];
+  bookmarks: { name: string; tasks: any[] }[] = [];
+  bookmarkName = "";
   checkbox = true;
   newTaskText = "";
-  nextTaskID = Number(localStorage.getItem("nextTaskID")) || 2;
+  nextTaskID = Number(localStorage.getItem("nextTaskID")) || 1;
   
   mounted() {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
       this.tasks = JSON.parse(storedTasks);
+    } else {
+      return;
     }
   }
 
@@ -113,6 +116,9 @@ export default class MainComponent extends Vue {
         text: this.newTaskText,
         completed: false,
       });
+    }
+    if(this.tasks.length === 1) {
+      this.$forceUpdate();
     }
     this.nextTaskID++;
     this.newTaskText = "";
@@ -134,6 +140,21 @@ export default class MainComponent extends Vue {
   removeAllTask() {
     if(window.confirm("すべての買い物リストを削除しますか？")) {
       this.tasks = [];
+    }
+  }
+
+  // localStorageにbookmarksデータ追加
+  addToBookmarks() {
+    const tasksData = localStorage.getItem("tasks");
+    if (tasksData) {
+      const tasks = JSON.parse(tasksData);
+      const bookmark = {
+        name: this.bookmarkName,
+        tasks: tasks,
+      };
+      this.bookmarks.push(bookmark);
+      localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
+
     }
   }
 }

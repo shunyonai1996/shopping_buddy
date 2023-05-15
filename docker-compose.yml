@@ -8,6 +8,7 @@ services:
     volumes:
       - ./frontend:/app
     command: npm run serve
+
   backend:
     build: ./backend
     ports:
@@ -15,6 +16,7 @@ services:
     volumes:
       - ./backend:/app
     command: npm start
+
   nginx:
     image: "nginx:latest"
     volumes:
@@ -22,6 +24,7 @@ services:
     build: ./nginx
     ports:
       - '80:80'
+      
   db:
     image: 'mysql:8.0'
     environment:
