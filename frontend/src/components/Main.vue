@@ -3,7 +3,7 @@
     <v-main ref="mainComponent">
 
       <div v-if="tasks.length > 0">
-          <v-btn @click="addToBookmarks">このリストをブックマークに追加</v-btn>
+          <v-btn @click="openModal">ブックマークに追加</v-btn>
           <v-btn @click="removeAllTask">全て削除</v-btn>
       </div>
 
@@ -70,6 +70,19 @@
           </v-col>
         </v-row>
       </v-container>
+
+      <v-dialog v-model="modalOpen" max-width="500">
+        <v-card>
+          <v-card-title>ブックマークに追加</v-card-title>
+          <v-card-text>
+            <v-text-field v-model="bookmarkName" label="ブックマーク名"></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="addToBookmarks">追加</v-btn>
+            <v-btn @click="closeModal">キャンセル</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-main>
   </div>
 </template>
@@ -87,16 +100,21 @@ import draggable from "vuedraggable";
 
 export default class MainComponent extends Vue {
   tasks: { id: number; text: string; completed: boolean }[] = [];
-  bookmarks: { name: string; tasks: any[] }[] = [];
+  bookmarks: { id: number; name: string; tasks: any[] }[] = [];
+  nextBookmarkID = Number(localStorage.getItem("nextBookmarkID")) || 1;
   bookmarkName = "";
   checkbox = true;
   newTaskText = "";
   nextTaskID = Number(localStorage.getItem("nextTaskID")) || 1;
+  modalOpen = false;
   
   mounted() {
     const storedTasks = localStorage.getItem("tasks");
+    const storedBookmarks = localStorage.getItem("bookmarks");
     if (storedTasks) {
       this.tasks = JSON.parse(storedTasks);
+    } else if (storedBookmarks) {
+      this.bookmarks = JSON.parse(storedBookmarks);
     } else {
       return;
     }
@@ -125,6 +143,30 @@ export default class MainComponent extends Vue {
     localStorage.setItem("nextTaskID", String(this.nextTaskID));
     console.log(this.tasks);
   }
+
+  // ブックマークを追加
+  addToBookmarks() {
+  const tasksData = localStorage.getItem("tasks");
+  if (tasksData) {
+    const tasks = JSON.parse(tasksData);
+    const bookmark = {
+      id: this.nextBookmarkID,
+      name: this.bookmarkName,
+      tasks: tasks,
+    };
+    const storedBookmarks = localStorage.getItem("bookmarks");
+    let bookmarks = [];
+    if (storedBookmarks) {
+      bookmarks = JSON.parse(storedBookmarks);
+    }
+    this.bookmarks.push(bookmark);
+    localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
+    this.closeModal();
+    this.nextBookmarkID++; // nextBookmarkID をインクリメントする
+    localStorage.setItem("nextBookmarkID", String(this.nextBookmarkID));
+  }
+}
+
   
   // タスクの削除
   deleteTask(index: number) {
@@ -136,27 +178,22 @@ export default class MainComponent extends Vue {
     task.completed = !task.completed;
    }
 
-  // localStorageのtasksのデータ削除
+  // 全タスクを削除
   removeAllTask() {
     if(window.confirm("すべての買い物リストを削除しますか？")) {
       this.tasks = [];
     }
   }
 
-  // localStorageにbookmarksデータ追加
-  addToBookmarks() {
-    const tasksData = localStorage.getItem("tasks");
-    if (tasksData) {
-      const tasks = JSON.parse(tasksData);
-      const bookmark = {
-        name: this.bookmarkName,
-        tasks: tasks,
-      };
-      this.bookmarks.push(bookmark);
-      localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
-
-    }
+  // モーダルウィンドウの開閉
+  openModal() {
+    this.modalOpen = true;
   }
+  closeModal() {
+    this.modalOpen = false;
+    this.bookmarkName = "";
+  }
+
 }
 </script>
 

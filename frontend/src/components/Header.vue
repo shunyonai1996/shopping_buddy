@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app color="#F57C00" dark>
     <v-img
-      :src="require('/src/assets/logo.png')"
+      :src="require('@/assets/logo.png')"
       max-height="50"
       max-width="50"
       class="ma-1 pa-1"
@@ -40,8 +40,11 @@ export default {
   },
   methods: {
     loadBookmark(bookmark) {
-      localStorage.setItem("tasks", JSON.stringify(bookmark.tasks));
+      localStorage.getItem("tasks", JSON.stringify(bookmark.tasks));
     }
+  },
+  watch: {
+    
   }
 };
 </script>
