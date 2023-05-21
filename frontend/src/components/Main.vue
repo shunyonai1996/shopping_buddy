@@ -91,6 +91,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
 import draggable from "vuedraggable";
+import { EventBus } from "@/event-bus";
 
 @Component({
   components: {
@@ -161,8 +162,9 @@ export default class MainComponent extends Vue {
     }
     this.bookmarks.push(bookmark);
     localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
+    EventBus.$emit("bookmarks-updated", this.bookmarks);
     this.closeModal();
-    this.nextBookmarkID++; // nextBookmarkID をインクリメントする
+    this.nextBookmarkID++;
     localStorage.setItem("nextBookmarkID", String(this.nextBookmarkID));
   }
 }

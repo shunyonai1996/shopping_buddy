@@ -27,24 +27,29 @@
 </template>
 
 <script>
+import { EventBus } from "@/event-bus";
+
 export default {
   name: "HeaderComponent",
-  props: {
-    bookmarks: {
-      type: Array,
-      default: () => {
-        const bookmarksData = localStorage.getItem("bookmarks");
-        return bookmarksData ? JSON.parse(bookmarksData) : [];
-      }
-    },
+  data() {
+    return {
+      bookmarks: [],
+    };
+  },
+  mounted() {
+    const bookmarksData = localStorage.getItem("bookmarks");
+    if (bookmarksData) {
+      this.bookmarks = JSON.parse(bookmarksData);
+      console.log(this.bookmarks);
+    }
+    EventBus.$on("bookmarks-updated", (bookmarks) => {
+      this.bookmarks = bookmarks;
+    });
   },
   methods: {
     loadBookmark(bookmark) {
-      localStorage.getItem("tasks", JSON.stringify(bookmark.tasks));
+      localStorage.getItem("bookmarks", JSON.stringify(bookmark.tasks));
     }
   },
-  watch: {
-    
-  }
 };
 </script>
