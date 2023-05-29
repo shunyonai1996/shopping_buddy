@@ -126,7 +126,7 @@ export default class MainComponent extends Vue {
   updateLocalStorage() {
     localStorage.setItem("tasks", JSON.stringify(this.tasks));
   }
-
+　
   // タスクの追加
   addTask() {
     if (this.newTaskText) {
@@ -160,9 +160,11 @@ export default class MainComponent extends Vue {
     if (storedBookmarks) {
       bookmarks = JSON.parse(storedBookmarks);
     }
-    this.bookmarks.push(bookmark);
-    localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
+    bookmarks = [...bookmarks, bookmark];
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+
     EventBus.$emit("bookmarks-updated", this.bookmarks);
+
     this.closeModal();
     this.nextBookmarkID++;
     localStorage.setItem("nextBookmarkID", String(this.nextBookmarkID));

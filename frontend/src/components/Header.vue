@@ -10,6 +10,9 @@
     <v-app-bar-title class="" >Shopping Buddy</v-app-bar-title>
 
     <v-spacer></v-spacer>
+    <a href="https://github.com/shunyonai1996/shopping_buddy">
+      <v-icon>mdi-github</v-icon>
+    </a>
 
     <v-menu bottom left>
       <template v-slot:activator="{ on }">
@@ -18,12 +21,20 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item v-for="(bookmark, index) in bookmarks" :key="index" @click="loadBookmark(bookmark)">
-          <v-list-item-title>{{ bookmark.name }}</v-list-item-title>
+        <v-list-item v-for="(bookmark, index) in bookmarks" :key="index">
+          <v-btn @click="changeBookmark">
+            <v-list-item-title>{{ bookmark.name }}</v-list-item-title>
+          </v-btn>
+          <span>｜</span>
+          <v-btn small @click="deleteBookmark" class="text-capitalize ma-1" icon>
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
         </v-list-item>
       </v-list>
     </v-menu>
-  </v-app-bar> 
+  </v-app-bar>
 </template>
 
 <script>
@@ -37,19 +48,25 @@ export default {
     };
   },
   mounted() {
-    const bookmarksData = localStorage.getItem("bookmarks");
-    if (bookmarksData) {
-      this.bookmarks = JSON.parse(bookmarksData);
-      console.log(this.bookmarks);
-    }
-    EventBus.$on("bookmarks-updated", (bookmarks) => {
-      this.bookmarks = bookmarks;
-    });
+    EventBus.$on("bookmarks-updated", this.loadBookmarks);
+    this.loadBookmarks();
+  },
+  beforeDestroy() {
+    EventBus.$off("bookmarks-updated", this.loadBookmarks);
   },
   methods: {
-    loadBookmark(bookmark) {
-      localStorage.getItem("bookmarks", JSON.stringify(bookmark.tasks));
-    }
+    loadBookmarks() {
+      const bookmarksData = localStorage.getItem("bookmarks");
+      if (bookmarksData) {
+        this.bookmarks = JSON.parse(bookmarksData);
+      }
+    },
+    changeBookmark() {
+      console.log("changeBookmark");
+    },
+    deleteBookmark() {
+      console.log("deleteBookmark");
+    },
   },
 };
 </script>
