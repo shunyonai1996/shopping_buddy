@@ -21,8 +21,11 @@
         </v-btn>
       </template>
       <v-list>
+        <v-row justify="center" class="ma-1 ">
+          <p>ブックマーク一覧</p>
+        </v-row>
         <v-list-item v-for="(bookmark, index) in bookmarks" :key="index">
-          <v-btn @click="changeBookmark">
+          <v-btn @click="changeBookmark(index)">
             <v-list-item-title>{{ bookmark.name }}</v-list-item-title>
           </v-btn>
           <span>｜</span>
@@ -37,7 +40,7 @@
   </v-app-bar>
 </template>
 
-<script>
+<script lang="ts">
 import { EventBus } from "@/event-bus";
 
 export default {
@@ -61,8 +64,16 @@ export default {
         this.bookmarks = JSON.parse(bookmarksData);
       }
     },
-    changeBookmark() {
-      console.log("changeBookmark");
+    changeBookmark(index) {
+      const bookmarkData = localStorage.getItem("bookmarks");
+      if(bookmarkData) {
+        const bookmarks = JSON.parse(bookmarkData);
+        if(index >= 0 && index < bookmarks.length) {
+          const tasks = bookmarks[index].tasks;
+          localStorage.setItem("tasks", JSON.stringify(tasks));
+          EventBus.$emit("tasks-updated", tasks);
+        }
+      }
     },
     deleteBookmark() {
       console.log("deleteBookmark");

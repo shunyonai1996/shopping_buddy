@@ -88,7 +88,7 @@
 </template>
 
 
-<script lang="ts">
+<script>
 import { Vue, Component, Watch } from "vue-property-decorator";
 import draggable from "vuedraggable";
 import { EventBus } from "@/event-bus";
@@ -108,8 +108,10 @@ export default class MainComponent extends Vue {
   newTaskText = "";
   nextTaskID = Number(localStorage.getItem("nextTaskID")) || 1;
   modalOpen = false;
+
   
   mounted() {
+    EventBus.$on("tasks-updated", this.updateTasks);
     const storedTasks = localStorage.getItem("tasks");
     const storedBookmarks = localStorage.getItem("bookmarks");
     if (storedTasks) {
@@ -120,6 +122,11 @@ export default class MainComponent extends Vue {
       return;
     }
   }
+
+  beforeDestroy() {
+    EventBus.$off("tasks-updated", this.updateTasks); // イベントリスナーを解除
+  }
+
 
   // `task`プロパティの変更を監視
   @Watch("tasks", { deep: true })
@@ -143,6 +150,11 @@ export default class MainComponent extends Vue {
     this.newTaskText = "";
     localStorage.setItem("nextTaskID", String(this.nextTaskID));
     console.log(this.tasks);
+  }
+
+  // タスクの更新
+  updateTasks(tasks: any) {
+    this.tasks = tasks;
   }
 
   // ブックマークを追加
@@ -170,6 +182,14 @@ export default class MainComponent extends Vue {
     localStorage.setItem("nextBookmarkID", String(this.nextBookmarkID));
   }
 }
+
+  // tasksの再読み込み
+  loadTasks(){
+    const tasksData = localStorage.getItem("tasks");
+    if(tasksData) {
+      this.tasks = JSON.parse(tasksData);
+    }
+  }
 
   
   // タスクの削除
