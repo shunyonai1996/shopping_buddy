@@ -1,10 +1,31 @@
 <template>
-  <div class="orange lighten-5" style="position: relative; min-height: 100%; margin-top: 50px;">
+  <div class="orange lighten-5" style="position: relative; min-height: 100%;">
     <v-main ref="mainComponent">
 
-      <div v-if="tasks.length > 0">
+      <div v-if="!showTasksControls" class="orange lighten-4" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
+        <v-btn @click="showTasksControls = true">
+          <span>オプション表示 </span>
+          <v-icon>
+            mdi-plus-circle-multiple-outline
+          </v-icon>
+        </v-btn>
+      </div>
+
+      <div v-if="tasks.length > 0 && showTasksControls" class="orange lighten-4" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
+        <div class="ma-1">
+          <v-btn @click="showTasksControls = false">
+            <span>閉じる </span>
+            <v-icon>
+              mdi-minus-circle-multiple-outline
+            </v-icon>
+          </v-btn>
+        </div>
+        <div class="ma-1">
           <v-btn @click="openModal">ブックマークに追加</v-btn>
+        </div>
+        <div class="ma-1">
           <v-btn @click="removeAllTask">全て削除</v-btn>
+        </div>
       </div>
 
       <v-container class="pb-5" v-if="tasks.length > 0">
@@ -108,6 +129,7 @@ export default class MainComponent extends Vue {
   newTaskText = "";
   nextTaskID = Number(localStorage.getItem("nextTaskID")) || 1;
   modalOpen = false;
+  showTasksControls = false;
 
   
   mounted() {

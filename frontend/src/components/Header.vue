@@ -10,9 +10,7 @@
     <v-app-bar-title class="" >Shopping Buddy</v-app-bar-title>
 
     <v-spacer></v-spacer>
-    <a href="https://github.com/shunyonai1996/shopping_buddy">
-      <v-icon>mdi-github</v-icon>
-    </a>
+
 
     <v-menu bottom left>
       <template v-slot:activator="{ on }">
