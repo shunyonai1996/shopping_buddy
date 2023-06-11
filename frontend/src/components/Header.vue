@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { EventBus } from "@/event-bus";
+import { EventBus } from "../event-bus";
 
 export default {
   name: "HeaderComponent",

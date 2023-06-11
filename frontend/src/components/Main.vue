@@ -88,7 +88,7 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
 import draggable from "vuedraggable";
 import { EventBus } from "@/event-bus";
