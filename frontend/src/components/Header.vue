@@ -29,7 +29,7 @@
             <v-list-item-title>{{ bookmark.name }}</v-list-item-title>
           </v-btn>
           <span>｜</span>
-          <v-btn small @click="deleteBookmark" class="text-capitalize ma-1" icon>
+          <v-btn small @click="deleteBookmark(index)" class="text-capitalize ma-1" icon>
             <v-icon>
               mdi-delete
             </v-icon>
@@ -47,7 +47,7 @@ export default {
   name: "HeaderComponent",
   data() {
     return {
-      bookmarks: [],
+      bookmarks: [] as {id: number; name: string; tasks: any[] }[],
     };
   },
   mounted() {
@@ -64,7 +64,7 @@ export default {
         this.bookmarks = JSON.parse(bookmarksData);
       }
     },
-    changeBookmark(index) {
+    changeBookmark(index: number) {
       const bookmarkData = localStorage.getItem("bookmarks");
       if(bookmarkData) {
         const bookmarks = JSON.parse(bookmarkData);
@@ -75,8 +75,16 @@ export default {
         }
       }
     },
-    deleteBookmark() {
-      console.log("deleteBookmark");
+    deleteBookmark(index: number) {
+      const bookmarkData = localStorage.getItem("bookmarks");
+      if(bookmarkData) {
+        const bookmarks = JSON.parse(bookmarkData) as { id: number; name: string; tasks: any[] }[];
+        if(index >= 0 && index < bookmarks.length) {
+          bookmarks.splice(index, 1);
+          localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+          this.loadBookmarks();
+        }
+      }
     },
   },
 };

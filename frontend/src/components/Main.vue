@@ -57,7 +57,7 @@
             <v-text-field
               label="入力して購入リストに追加"
               class="todo-input"
-              color="#F57C00"
+              color="#F57C00" 
               v-model="newTaskText"
             ></v-text-field>
           </v-col>
@@ -149,7 +149,6 @@ export default class MainComponent extends Vue {
     this.nextTaskID++;
     this.newTaskText = "";
     localStorage.setItem("nextTaskID", String(this.nextTaskID));
-    console.log(this.tasks);
   }
 
   // タスクの更新
